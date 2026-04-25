@@ -416,25 +416,17 @@ def build_chart(y_real, y_pred, title, pred_color):
         line=dict(color=pred_color, width=2, dash="dash")
     ))
     fig.update_layout(
-        title=dict(text=title, font=dict(color="black", size=15), x=0, xanchor="left"),
+        title=title,
         xaxis_title="Amostra",
         yaxis_title="Valor",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         plot_bgcolor="#fafafa",
         paper_bgcolor="white",
-        margin=dict(l=50, r=20, t=60, b=40),
-        height=320,
+        margin=dict(l=50, r=20, t=50, b=40),
+        height=300,
     )
-    fig.update_xaxes(
-        showgrid=True, gridcolor="#000000",
-        title_font=dict(color="black"),
-        tickfont=dict(color="black"),
-    )
-    fig.update_yaxes(
-        showgrid=True, gridcolor="#000000",
-        title_font=dict(color="black"),
-        tickfont=dict(color="black"),
-    )
+    fig.update_xaxes(showgrid=True, gridcolor="#e0e0e0")
+    fig.update_yaxes(showgrid=True, gridcolor="#e0e0e0")
     return fig
 
 
@@ -658,21 +650,11 @@ with tab_charts:
                 name=label, marker=dict(color=color, size=6, opacity=0.7)
             ))
         fig_scatter.update_layout(
-            title=dict(text="Dispersão Real × Predito", font=dict(color="black", size=15), x=0, xanchor="left"),
             xaxis_title="Valor Real", yaxis_title="Valor Predito",
             plot_bgcolor="#fafafa", paper_bgcolor="white",
             legend=dict(orientation="h", yanchor="bottom", y=1.02),
-            margin=dict(l=50, r=20, t=60, b=40),
-            height=420
+            height=400
         )
-        fig_scatter.update_xaxes(
-            showgrid=True, gridcolor="#000000",
-            title_font=dict(color="black"),
-            tickfont=dict(color="black"),
-        )
-        fig_scatter.update_yaxes(
-            showgrid=True, gridcolor="#000000",
-            title_font=dict(color="black"),
-            tickfont=dict(color="black"),
-        )
+        fig_scatter.update_xaxes(showgrid=True, gridcolor="#e0e0e0")
+        fig_scatter.update_yaxes(showgrid=True, gridcolor="#e0e0e0")
         st.plotly_chart(fig_scatter, use_container_width=True)
