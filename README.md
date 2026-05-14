@@ -23,26 +23,33 @@ Acesse em: `http://localhost:8501`
 
 ## 📁 Formato dos arquivos de entrada
 
-| Arquivo  | Formato                                      |
-|----------|----------------------------------------------|
-| Xcal.txt | Matriz: uma amostra por linha, colunas separadas por espaço |
-| Ycal.txt | Vetor: um valor por linha                    |
-| Xteste.txt | Igual ao Xcal                              |
-| Yteste.txt | Igual ao Ycal                              |
+| Arquivo    | Formato                                                      |
+|------------|--------------------------------------------------------------|
+| Xcal.txt   | Matriz: uma amostra por linha, colunas separadas por espaço  |
+| Ycal.txt   | Vetor: um valor por linha                                    |
+| Xteste.txt | Igual ao Xcal                                                |
+| Yteste.txt | Igual ao Ycal                                                |
+
+> **Atenção:** não utilize vírgulas ou ponto e vírgula como separadores em nenhum dos arquivos.
+> Vetores (Ycal, Yteste) aceitam apenas **um valor por linha**; matrizes (Xcal, Xteste) separam
+> colunas exclusivamente por **espaços simples**.
+
+A interface exibe, em cada campo de upload, um tooltip `?` e um expander
+**"ℹ️ Como formatar o arquivo.txt"** com as regras e um exemplo de formato para orientar o usuário.
 
 ## 🔄 Correspondência Vaadin → Streamlit
 
-| Vaadin (Java)              | Streamlit (Python)         |
-|----------------------------|----------------------------|
-| `@Route("")`               | `st.set_page_config()`     |
-| `Tabs`                     | `st.tabs()`                |
-| `Upload + MemoryBuffer`    | `st.file_uploader()`       |
-| `TextField`                | `st.text_input()`          |
-| `Button + ClickListener`   | `st.button()`              |
-| `ProgressBar`              | `st.progress()`            |
-| `Grid<Entidade>`           | `st.dataframe()`           |
-| `Notification`             | `st.success()` / `st.error()` |
-| SVG inline (gráficos)      | `plotly` interativo        |
-| `CompletableFuture`        | Execução síncrona direta   |
-| `RegressionService` (Java) | Funções Python com NumPy   |
-| `EJML SimpleMatrix`        | `numpy.linalg.pinv()`      |
+| Vaadin (Java)              | Streamlit (Python)              |
+|----------------------------|---------------------------------|
+| `@Route("")`               | `st.set_page_config()`          |
+| `Tabs`                     | `st.tabs()`                     |
+| `Upload + MemoryBuffer`    | `st.file_uploader()`            |
+| `TextField`                | `st.text_input()`               |
+| `Button + ClickListener`   | `st.button()`                   |
+| `ProgressBar`              | `st.progress()`                 |
+| `Grid<Entidade>`           | `st.dataframe()`                |
+| `Notification`             | `st.success()` / `st.error()`   |
+| SVG inline (gráficos)      | `plotly` interativo             |
+| `CompletableFuture`        | Execução síncrona direta        |
+| `RegressionService` (Java) | Funções Python com NumPy        |
+| `EJML SimpleMatrix`        | `numpy.linalg.pinv()`           |

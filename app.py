@@ -466,32 +466,118 @@ with tab_config:
     with col1:
         st.markdown('<div class="upload-hint">🔷 Xcal</div>', unsafe_allow_html=True)
         st.markdown('<div class="upload-desc">Calibração - X (matriz)</div>', unsafe_allow_html=True)
-        xcal_file = st.file_uploader("Xcal.txt", type=["txt"], key="xcal", label_visibility="collapsed")
+        xcal_file = st.file_uploader(
+            "Xcal.txt", type=["txt"], key="xcal", label_visibility="collapsed",
+            help=(
+                "📐 Formato de matriz\n\n"
+                "• Separe os elementos de cada linha apenas com espaços simples.\n"
+                "• Não utilize vírgulas ou ponto e vírgula.\n"
+                "• Mantenha a estrutura do arquivo de exemplo para garantir o cálculo correto na interface.\n\n"
+                "Exemplo:\n"
+                "0.123 0.456 0.789\n"
+                "0.321 0.654 0.987\n"
+                "0.111 0.222 0.333"
+            )
+        )
         if xcal_file:
             st.success(f"✅ Xcal carregado: {xcal_file.name}")
+        with st.expander("ℹ️ Como formatar o Xcal.txt"):
+            st.markdown(
+                "**Formato:** Matriz — separe os elementos de cada linha apenas com **espaços simples**. "
+                "Não utilize vírgulas ou ponto e vírgula.\n\n"
+                "```\n"
+                "0.123 0.456 0.789\n"
+                "0.321 0.654 0.987\n"
+                "0.111 0.222 0.333\n"
+                "```"
+            )
 
     with col2:
         st.markdown('<div class="upload-hint">📉 Ycal</div>', unsafe_allow_html=True)
         st.markdown('<div class="upload-desc">Calibração - Y (vetor)</div>', unsafe_allow_html=True)
-        ycal_file = st.file_uploader("Ycal.txt", type=["txt"], key="ycal", label_visibility="collapsed")
+        ycal_file = st.file_uploader(
+            "Ycal.txt", type=["txt"], key="ycal", label_visibility="collapsed",
+            help=(
+                "📋 Formato de vetor coluna\n\n"
+                "• Insira um valor por linha.\n"
+                "• Não utilize vírgulas ou ponto e vírgula como separadores ou finalizadores.\n\n"
+                "Exemplo:\n"
+                "1.23\n"
+                "4.56\n"
+                "7.89"
+            )
+        )
         if ycal_file:
             st.success(f"✅ Ycal carregado: {ycal_file.name}")
+        with st.expander("ℹ️ Como formatar o Ycal.txt"):
+            st.markdown(
+                "**Formato:** Vetor coluna — insira **um valor por linha**. "
+                "Não utilize vírgulas ou ponto e vírgula.\n\n"
+                "```\n"
+                "1.23\n"
+                "4.56\n"
+                "7.89\n"
+                "```"
+            )
 
     col3, col4 = st.columns(2)
 
     with col3:
         st.markdown('<div class="upload-hint">🔹 Xteste</div>', unsafe_allow_html=True)
         st.markdown('<div class="upload-desc">Teste - X (matriz)</div>', unsafe_allow_html=True)
-        xteste_file = st.file_uploader("Xteste.txt", type=["txt"], key="xteste", label_visibility="collapsed")
+        xteste_file = st.file_uploader(
+            "Xteste.txt", type=["txt"], key="xteste", label_visibility="collapsed",
+            help=(
+                "📐 Formato de matriz\n\n"
+                "• Separe os elementos de cada linha apenas com espaços simples.\n"
+                "• Não utilize vírgulas ou ponto e vírgula.\n"
+                "• Mantenha a estrutura do arquivo de exemplo para garantir o cálculo correto na interface.\n\n"
+                "Exemplo:\n"
+                "0.123 0.456 0.789\n"
+                "0.321 0.654 0.987\n"
+                "0.111 0.222 0.333"
+            )
+        )
         if xteste_file:
             st.success(f"✅ Xteste carregado: {xteste_file.name}")
+        with st.expander("ℹ️ Como formatar o Xteste.txt"):
+            st.markdown(
+                "**Formato:** Matriz — separe os elementos de cada linha apenas com **espaços simples**. "
+                "Não utilize vírgulas ou ponto e vírgula.\n\n"
+                "```\n"
+                "0.123 0.456 0.789\n"
+                "0.321 0.654 0.987\n"
+                "0.111 0.222 0.333\n"
+                "```"
+            )
 
     with col4:
         st.markdown('<div class="upload-hint">📈 Yteste</div>', unsafe_allow_html=True)
         st.markdown('<div class="upload-desc">Teste - Y (vetor)</div>', unsafe_allow_html=True)
-        yteste_file = st.file_uploader("Yteste.txt", type=["txt"], key="yteste", label_visibility="collapsed")
+        yteste_file = st.file_uploader(
+            "Yteste.txt", type=["txt"], key="yteste", label_visibility="collapsed",
+            help=(
+                "📋 Formato de vetor coluna\n\n"
+                "• Insira um valor por linha.\n"
+                "• Não utilize vírgulas ou ponto e vírgula como separadores ou finalizadores.\n\n"
+                "Exemplo:\n"
+                "1.23\n"
+                "4.56\n"
+                "7.89"
+            )
+        )
         if yteste_file:
             st.success(f"✅ Yteste carregado: {yteste_file.name}")
+        with st.expander("ℹ️ Como formatar o Yteste.txt"):
+            st.markdown(
+                "**Formato:** Vetor coluna — insira **um valor por linha**. "
+                "Não utilize vírgulas ou ponto e vírgula.\n\n"
+                "```\n"
+                "1.23\n"
+                "4.56\n"
+                "7.89\n"
+                "```"
+            )
 
     st.markdown("---")
     st.markdown("### ⚙️ Parâmetros de Otimização")
