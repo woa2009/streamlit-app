@@ -14,6 +14,8 @@ streamlit run app.py
 
 Acesse em: `http://localhost:8501`
 
+> `requirements.txt` inclui `openpyxl>=3.1.0`, necessário para leitura de arquivos `.xlsx`.
+
 ## ☁️ Deploy no Streamlit Community Cloud (gratuito)
 
 1. Suba este repositório no GitHub
@@ -23,19 +25,34 @@ Acesse em: `http://localhost:8501`
 
 ## 📁 Formato dos arquivos de entrada
 
-| Arquivo    | Formato                                                      |
-|------------|--------------------------------------------------------------|
-| Xcal.txt   | Matriz: uma amostra por linha, colunas separadas por espaço  |
-| Ycal.txt   | Vetor: um valor por linha                                    |
-| Xteste.txt | Igual ao Xcal                                                |
-| Yteste.txt | Igual ao Ycal                                                |
+Os quatro arquivos aceitam **três formatos**: `.txt`, `.csv` e `.xlsx`.
 
-> **Atenção:** não utilize vírgulas ou ponto e vírgula como separadores em nenhum dos arquivos.
-> Vetores (Ycal, Yteste) aceitam apenas **um valor por linha**; matrizes (Xcal, Xteste) separam
-> colunas exclusivamente por **espaços simples**.
+| Arquivo               | Tipo   | Regras |
+|-----------------------|--------|--------|
+| Xcal `.txt/csv/xlsx`  | Matriz | Colunas por espaço (`.txt`), vírgula ou `;` (`.csv`), planilha sem cabeçalho (`.xlsx`) |
+| Ycal `.txt/csv/xlsx`  | Vetor  | Um valor por linha; primeira coluna em `.csv`/`.xlsx` |
+| Xteste `.txt/csv/xlsx`| Matriz | Igual ao Xcal |
+| Yteste `.txt/csv/xlsx`| Vetor  | Igual ao Ycal |
+
+### Regras por formato
+
+**`.txt`**
+- Matrizes: colunas separadas por **espaços simples**, uma amostra por linha.
+- Vetores: **um valor por linha**, sem separadores adicionais.
+- Decimal: ponto (`.`) ou vírgula (`,` — padrão BR).
+
+**`.csv`**
+- Separador de coluna detectado automaticamente: **vírgula** (`,`) ou **ponto-e-vírgula** (`;`).
+- Se o separador for `;`, vírgulas são tratadas como separador decimal (padrão BR).
+- Não misture separador de coluna e decimal no mesmo arquivo.
+
+**`.xlsx`**
+- Primeira planilha utilizada, sem linha de cabeçalho.
+- Matrizes: cada linha = uma amostra; colunas = variáveis.
+- Vetores: primeira coluna utilizada.
 
 A interface exibe, em cada campo de upload, um tooltip `?` e um expander
-**"ℹ️ Como formatar o arquivo.txt"** com as regras e um exemplo de formato para orientar o usuário.
+**"ℹ️ Como formatar o arquivo"** com exemplos para cada formato.
 
 ## 🔄 Correspondência Vaadin → Streamlit
 

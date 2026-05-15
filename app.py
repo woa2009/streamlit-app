@@ -104,11 +104,45 @@ st.markdown("""
 # LÓGICA DE REGRESSÃO  (tradução direta do RegressionService.java)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def parse_matrix(content: bytes) -> np.ndarray:
-    """Lê matriz numérica de bytes (linhas × colunas, separado por espaço/tab)."""
-    lines = content.decode("utf-8", errors="ignore").splitlines()
+def _file_ext(file_obj) -> str:
+    """Retorna extensão do arquivo em minúsculas (ex.: 'csv', 'xlsx', 'txt')."""
+    name = getattr(file_obj, "name", "")
+    return name.rsplit(".", 1)[-1].lower() if "." in name else "txt"
+
+
+def _detect_csv_sep(text: str) -> str:
+    """Detecta separador de colunas do CSV: ';' tem prioridade sobre ','."""
+    return ";" if text.count(";") >= text.count(",") else ","
+
+
+def parse_matrix(file_obj) -> np.ndarray:
+    """
+    Lê uma matriz numérica de um arquivo .txt, .csv ou .xlsx.
+
+    .txt  → colunas separadas por espaço/tab; decimal pode ser vírgula (BR) ou ponto.
+    .csv  → separador de coluna detectado automaticamente (vírgula ou ponto-e-vírgula);
+            se o separador for ';', vírgulas são tratadas como decimal (padrão BR).
+    .xlsx → primeira planilha; sem linha de cabeçalho; cada linha = uma amostra.
+    """
+    ext = _file_ext(file_obj)
+    raw = file_obj.read()
+
+    if ext == "xlsx":
+        df = pd.read_excel(io.BytesIO(raw), header=None, engine="openpyxl")
+        return df.apply(pd.to_numeric, errors="coerce").dropna(how="all").values.astype(float)
+
+    text = raw.decode("utf-8", errors="ignore")
+
+    if ext == "csv":
+        sep = _detect_csv_sep(text)
+        if sep == ";":                        # decimal BR: troca ',' por '.'
+            text = text.replace(",", ".")
+        df = pd.read_csv(io.StringIO(text), sep=sep, header=None)
+        return df.apply(pd.to_numeric, errors="coerce").dropna(how="all").values.astype(float)
+
+    # .txt (comportamento original, suporta decimal BR)
     rows = []
-    for line in lines:
+    for line in text.splitlines():
         line = line.strip().replace(",", ".")
         if not line:
             continue
@@ -116,11 +150,35 @@ def parse_matrix(content: bytes) -> np.ndarray:
     return np.array(rows)
 
 
-def parse_vector(content: bytes) -> np.ndarray:
-    """Lê vetor numérico de bytes (um valor por linha)."""
-    lines = content.decode("utf-8", errors="ignore").splitlines()
+def parse_vector(file_obj) -> np.ndarray:
+    """
+    Lê um vetor numérico (coluna) de um arquivo .txt, .csv ou .xlsx.
+
+    .txt  → um valor por linha.
+    .csv  → primeira coluna utilizada; cabeçalho não-numérico ignorado automaticamente.
+    .xlsx → primeira coluna da primeira planilha.
+    """
+    ext = _file_ext(file_obj)
+    raw = file_obj.read()
+
+    if ext == "xlsx":
+        df = pd.read_excel(io.BytesIO(raw), header=None, engine="openpyxl")
+        col = pd.to_numeric(df.iloc[:, 0], errors="coerce").dropna()
+        return col.values.astype(float)
+
+    text = raw.decode("utf-8", errors="ignore")
+
+    if ext == "csv":
+        sep = _detect_csv_sep(text)
+        if sep == ";":
+            text = text.replace(",", ".")
+        df = pd.read_csv(io.StringIO(text), sep=sep, header=None)
+        col = pd.to_numeric(df.iloc[:, 0], errors="coerce").dropna()
+        return col.values.astype(float)
+
+    # .txt
     data = []
-    for line in lines:
+    for line in text.splitlines():
         line = line.strip().replace(",", ".")
         if not line:
             continue
@@ -463,121 +521,94 @@ with tab_config:
 
     col1, col2 = st.columns(2)
 
+    # ── strings reutilizáveis ──────────────────────────────────────────────────
+    _TIPOS_MATRIZ = ["txt", "csv", "xlsx"]
+    _TIPOS_VETOR  = ["txt", "csv", "xlsx"]
+
+    _HELP_MATRIZ = (
+        "📐 Formato de matriz — aceita .txt · .csv · .xlsx\n\n"
+        "• .txt  → colunas separadas por espaços simples, uma amostra por linha.\n"
+        "• .csv  → separador de coluna detectado automaticamente (vírgula ou ponto-e-vírgula).\n"
+        "• .xlsx → primeira planilha, sem linha de cabeçalho; cada linha = uma amostra.\n\n"
+        "Não misture separadores de coluna e decimal no mesmo arquivo."
+    )
+    _HELP_VETOR = (
+        "📋 Formato de vetor coluna — aceita .txt · .csv · .xlsx\n\n"
+        "• .txt  → um valor por linha, sem separadores adicionais.\n"
+        "• .csv  → primeira coluna utilizada; cabeçalho não-numérico ignorado.\n"
+        "• .xlsx → primeira coluna da primeira planilha.\n\n"
+        "Não utilize vírgulas ou ponto e vírgula em arquivos .txt."
+    )
+    _EXP_MATRIZ = (
+        "**Formatos aceitos:** `.txt` · `.csv` · `.xlsx`\n\n"
+        "| Formato | Regra |\n"
+        "|---------|-------|\n"
+        "| `.txt`  | Colunas separadas por **espaços simples**, uma amostra por linha |\n"
+        "| `.csv`  | Separador de coluna: **vírgula** ou **ponto-e-vírgula** (detectado automaticamente) |\n"
+        "| `.xlsx` | Primeira planilha, sem linha de cabeçalho |\n\n"
+        "**Exemplo (.txt):**\n```\n0.123 0.456 0.789\n0.321 0.654 0.987\n0.111 0.222 0.333\n```\n\n"
+        "**Exemplo (.csv com `;`):**\n```\n0.123;0.456;0.789\n0.321;0.654;0.987\n```"
+    )
+    _EXP_VETOR = (
+        "**Formatos aceitos:** `.txt` · `.csv` · `.xlsx`\n\n"
+        "| Formato | Regra |\n"
+        "|---------|-------|\n"
+        "| `.txt`  | **Um valor por linha**, sem separadores adicionais |\n"
+        "| `.csv`  | Primeira coluna utilizada; cabeçalho não-numérico ignorado |\n"
+        "| `.xlsx` | Primeira coluna da primeira planilha |\n\n"
+        "**Exemplo (.txt / .csv):**\n```\n1.23\n4.56\n7.89\n```"
+    )
+    # ──────────────────────────────────────────────────────────────────────────
+
     with col1:
         st.markdown('<div class="upload-hint">🔷 Xcal</div>', unsafe_allow_html=True)
-        st.markdown('<div class="upload-desc">Calibração - X (matriz)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-desc">Calibração - X (matriz) — .txt · .csv · .xlsx</div>', unsafe_allow_html=True)
         xcal_file = st.file_uploader(
-            "Xcal.txt", type=["txt"], key="xcal", label_visibility="collapsed",
-            help=(
-                "📐 Formato de matriz\n\n"
-                "• Separe os elementos de cada linha apenas com espaços simples.\n"
-                "• Não utilize vírgulas ou ponto e vírgula.\n"
-                "• Mantenha a estrutura do arquivo de exemplo para garantir o cálculo correto na interface.\n\n"
-                "Exemplo:\n"
-                "0.123 0.456 0.789\n"
-                "0.321 0.654 0.987\n"
-                "0.111 0.222 0.333"
-            )
+            "Xcal — matriz", type=_TIPOS_MATRIZ, key="xcal",
+            label_visibility="collapsed", help=_HELP_MATRIZ
         )
         if xcal_file:
             st.success(f"✅ Xcal carregado: {xcal_file.name}")
-        with st.expander("ℹ️ Como formatar o Xcal.txt"):
-            st.markdown(
-                "**Formato:** Matriz — separe os elementos de cada linha apenas com **espaços simples**. "
-                "Não utilize vírgulas ou ponto e vírgula.\n\n"
-                "```\n"
-                "0.123 0.456 0.789\n"
-                "0.321 0.654 0.987\n"
-                "0.111 0.222 0.333\n"
-                "```"
-            )
+        with st.expander("ℹ️ Como formatar o Xcal"):
+            st.markdown(_EXP_MATRIZ)
 
     with col2:
         st.markdown('<div class="upload-hint">📉 Ycal</div>', unsafe_allow_html=True)
-        st.markdown('<div class="upload-desc">Calibração - Y (vetor)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-desc">Calibração - Y (vetor) — .txt · .csv · .xlsx</div>', unsafe_allow_html=True)
         ycal_file = st.file_uploader(
-            "Ycal.txt", type=["txt"], key="ycal", label_visibility="collapsed",
-            help=(
-                "📋 Formato de vetor coluna\n\n"
-                "• Insira um valor por linha.\n"
-                "• Não utilize vírgulas ou ponto e vírgula como separadores ou finalizadores.\n\n"
-                "Exemplo:\n"
-                "1.23\n"
-                "4.56\n"
-                "7.89"
-            )
+            "Ycal — vetor", type=_TIPOS_VETOR, key="ycal",
+            label_visibility="collapsed", help=_HELP_VETOR
         )
         if ycal_file:
             st.success(f"✅ Ycal carregado: {ycal_file.name}")
-        with st.expander("ℹ️ Como formatar o Ycal.txt"):
-            st.markdown(
-                "**Formato:** Vetor coluna — insira **um valor por linha**. "
-                "Não utilize vírgulas ou ponto e vírgula.\n\n"
-                "```\n"
-                "1.23\n"
-                "4.56\n"
-                "7.89\n"
-                "```"
-            )
+        with st.expander("ℹ️ Como formatar o Ycal"):
+            st.markdown(_EXP_VETOR)
 
     col3, col4 = st.columns(2)
 
     with col3:
         st.markdown('<div class="upload-hint">🔹 Xteste</div>', unsafe_allow_html=True)
-        st.markdown('<div class="upload-desc">Teste - X (matriz)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-desc">Teste - X (matriz) — .txt · .csv · .xlsx</div>', unsafe_allow_html=True)
         xteste_file = st.file_uploader(
-            "Xteste.txt", type=["txt"], key="xteste", label_visibility="collapsed",
-            help=(
-                "📐 Formato de matriz\n\n"
-                "• Separe os elementos de cada linha apenas com espaços simples.\n"
-                "• Não utilize vírgulas ou ponto e vírgula.\n"
-                "• Mantenha a estrutura do arquivo de exemplo para garantir o cálculo correto na interface.\n\n"
-                "Exemplo:\n"
-                "0.123 0.456 0.789\n"
-                "0.321 0.654 0.987\n"
-                "0.111 0.222 0.333"
-            )
+            "Xteste — matriz", type=_TIPOS_MATRIZ, key="xteste",
+            label_visibility="collapsed", help=_HELP_MATRIZ
         )
         if xteste_file:
             st.success(f"✅ Xteste carregado: {xteste_file.name}")
-        with st.expander("ℹ️ Como formatar o Xteste.txt"):
-            st.markdown(
-                "**Formato:** Matriz — separe os elementos de cada linha apenas com **espaços simples**. "
-                "Não utilize vírgulas ou ponto e vírgula.\n\n"
-                "```\n"
-                "0.123 0.456 0.789\n"
-                "0.321 0.654 0.987\n"
-                "0.111 0.222 0.333\n"
-                "```"
-            )
+        with st.expander("ℹ️ Como formatar o Xteste"):
+            st.markdown(_EXP_MATRIZ)
 
     with col4:
         st.markdown('<div class="upload-hint">📈 Yteste</div>', unsafe_allow_html=True)
-        st.markdown('<div class="upload-desc">Teste - Y (vetor)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-desc">Teste - Y (vetor) — .txt · .csv · .xlsx</div>', unsafe_allow_html=True)
         yteste_file = st.file_uploader(
-            "Yteste.txt", type=["txt"], key="yteste", label_visibility="collapsed",
-            help=(
-                "📋 Formato de vetor coluna\n\n"
-                "• Insira um valor por linha.\n"
-                "• Não utilize vírgulas ou ponto e vírgula como separadores ou finalizadores.\n\n"
-                "Exemplo:\n"
-                "1.23\n"
-                "4.56\n"
-                "7.89"
-            )
+            "Yteste — vetor", type=_TIPOS_VETOR, key="yteste",
+            label_visibility="collapsed", help=_HELP_VETOR
         )
         if yteste_file:
             st.success(f"✅ Yteste carregado: {yteste_file.name}")
-        with st.expander("ℹ️ Como formatar o Yteste.txt"):
-            st.markdown(
-                "**Formato:** Vetor coluna — insira **um valor por linha**. "
-                "Não utilize vírgulas ou ponto e vírgula.\n\n"
-                "```\n"
-                "1.23\n"
-                "4.56\n"
-                "7.89\n"
-                "```"
-            )
+        with st.expander("ℹ️ Como formatar o Yteste"):
+            st.markdown(_EXP_VETOR)
 
     st.markdown("---")
     st.markdown("### ⚙️ Parâmetros de Otimização")
@@ -614,10 +645,10 @@ with tab_config:
 
         # Leitura dos arquivos
         try:
-            Xcal   = parse_matrix(xcal_file.read())
-            Ycal   = parse_vector(ycal_file.read())
-            Xteste = parse_matrix(xteste_file.read())
-            Yteste = parse_vector(yteste_file.read())
+            Xcal   = parse_matrix(xcal_file)
+            Ycal   = parse_vector(ycal_file)
+            Xteste = parse_matrix(xteste_file)
+            Yteste = parse_vector(yteste_file)
         except Exception as e:
             st.error(f"❌ Erro ao ler arquivos: {e}")
             st.stop()
