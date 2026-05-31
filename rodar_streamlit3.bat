@@ -24,10 +24,17 @@ if errorlevel 1 (
 )
 
 echo ======================================================
-echo   EXECUTANDO STREAMLIT...
+echo   ATUALIZANDO OPENPYXL NO AMBIENTE ANACONDA...
 echo ======================================================
 
-:: Executa o app
-streamlit run app.py
+:: Atualiza openpyxl no Python do Anaconda (mesmo ambiente ativado acima)
+python -m pip install "openpyxl>=3.1.0" --upgrade --force-reinstall -q
+
+echo ======================================================
+echo   EXECUTANDO STREAMLIT (porta 8502)...
+echo ======================================================
+
+:: Executa o app na porta 8502 (8501 reservada pelo sistema Windows)
+streamlit run app.py --server.port 8502
 
 pause
