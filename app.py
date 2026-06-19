@@ -7,7 +7,7 @@ Toda a matemática vem de models.py.
 Todos os gráficos e componentes visuais vêm de components.py.
 
 Autor: Wagner Oliveira de Araujo
-Versão: 8
+Versão: 8a
 """
 
 import streamlit as st

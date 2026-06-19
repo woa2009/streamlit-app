@@ -6,7 +6,7 @@ Contém exclusivamente funções puras (NumPy/Pandas).
 Nenhuma dependência de Streamlit ou de bibliotecas visuais.
 
 Autor: Wagner Oliveira de Araujo
-Versão: 8
+Versão: 8a
 """
 
 import io

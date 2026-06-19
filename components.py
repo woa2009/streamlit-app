@@ -6,7 +6,7 @@ Contém exclusivamente funções de construção de gráficos (Plotly)
 e componentes HTML de interface. Nenhuma lógica matemática aqui.
 
 Autor: Wagner Oliveira de Araujo
-Versão: 8
+Versão: 8a
 """
 
 import plotly.graph_objects as go
