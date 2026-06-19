@@ -6,6 +6,7 @@ Implementa RLM Simples, RLM + Bagging e RLM + Subagging com otimização
 de hiperparâmetros por validação cruzada 5-fold.
 
 Autor: Wagner Oliveira de Araujo
+Versão: 7
 
 ## 🗂️ Estrutura do Projeto
 
