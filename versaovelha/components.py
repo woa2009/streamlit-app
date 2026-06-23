@@ -6,7 +6,7 @@ Contém exclusivamente funções de construção de gráficos (Plotly)
 e componentes HTML de interface. Nenhuma lógica matemática aqui.
 
 Autor: Wagner Oliveira de Araujo
-Versão: 8b
+Versão: 8a
 """
 
 import plotly.graph_objects as go
@@ -19,7 +19,6 @@ import plotly.graph_objects as go
 COR_RLM       = "#2196f3"   # Azul
 COR_BAGGING   = "#4caf50"   # Verde
 COR_SUBAGGING = "#9c27b0"   # Roxo
-COR_REAL      = "#f44336"   # Vermelho (Valor Real nos gráficos de linha)
 
 _GRID_COLOR = "#000000"
 _PLOT_BG    = "#fafafa"
@@ -119,7 +118,7 @@ def build_chart(
     lang: str = "pt",
 ) -> go.Figure:
     """
-    Gráfico de linha sobreposto: valores reais (vermelho) × preditos (colorido por modelo).
+    Gráfico de linha sobreposto: valores reais (azul) × preditos (colorido por modelo).
 
     Parâmetros
     ----------
@@ -137,7 +136,7 @@ def build_chart(
         x=x, y=y_real,
         mode="lines",
         name=_t(lang, "label_real"),
-        line=dict(color=COR_REAL, width=2),
+        line=dict(color=COR_RLM, width=2),
         showlegend=True,
     ))
     fig.add_trace(go.Scatter(
